@@ -176,6 +176,8 @@ if __name__ == "__main__":
     experiment_type = 'ffhq_encode'
     images_path = '/home/carles/repos/matriu.id/ideal/image_enconding/input_images'
     output_path = '/home/carles/repos/matriu.id/ideal/image_enconding/test_average_sqtylegan_3'
+    show_images = True
+
     if not os.path.exists(output_path):
         os.makedirs(output_path)
 
@@ -210,22 +212,22 @@ if __name__ == "__main__":
     print(f'type(result_latents): {type(result_latents)}')
     print(f'result_latents.shape: {result_latents.shape}')
 
-    for og_image, result_img in zip(input_images, result_images):
-        input_vis_image = log_input_image(og_image, opts)
-        output_image = tensor2im(result_img)
-        input_latents.append(result_latents.squeeze(0))
+    if show_images:
+        for og_image, result_img in zip(input_images, result_images):
+            input_vis_image = log_input_image(og_image, opts)
+            output_image = tensor2im(result_img)
 
-        if experiment_type == "celebs_super_resolution":
-            res = np.concatenate([
-                                # np.array(input_image.resize((256, 256))),
-                                np.array(input_vis_image.resize((256, 256))),
-                                np.array(output_image.resize((256, 256)))], axis=1)
-        else:
-            res = np.concatenate([np.array(input_vis_image.resize((256, 256))),
-                                np.array(output_image.resize((256, 256)))], axis=1)
+            if experiment_type == "celebs_super_resolution":
+                res = np.concatenate([
+                                    # np.array(og_image.resize((256, 256))),
+                                    np.array(input_vis_image.resize((256, 256))),
+                                    np.array(output_image.resize((256, 256)))], axis=1)
+            else:
+                res = np.concatenate([np.array(input_vis_image.resize((256, 256))),
+                                    np.array(output_image.resize((256, 256)))], axis=1)
 
-        res_image = Image.fromarray(res)
-        res_image.show()
+            res_image = Image.fromarray(res)
+            res_image.show()
 
     mean_latent = torch.mean(result_latents, dim=0)
     mean_image, _ = decode_image_latent(net, mean_latent.unsqueeze(0))
