@@ -1,1 +1,9 @@
 *.DS_Store
+
+__pycache__/
+.vscode/
+
+*.png
+*.jpg
+*.pt
+*.dat
