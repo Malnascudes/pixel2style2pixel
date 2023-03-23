@@ -200,11 +200,7 @@ if __name__ == "__main__":
     print('Model successfully loaded!')
 
     img_transforms = EXPERIMENT_ARGS['transform']
-    input_image = load_images(images_path, img_transforms)[0]
     input_images = load_images(images_path, img_transforms)
-    
-    # transformed_image = img_transforms(input_image)
-    input_latents = []
 
     ## PERFORM INFERENCE
     print(f'Performing inference')
