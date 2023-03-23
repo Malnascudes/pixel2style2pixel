@@ -212,6 +212,13 @@ if __name__ == "__main__":
     print(f'type(result_latents): {type(result_latents)}')
     print(f'result_latents.shape: {result_latents.shape}')
 
+    mean_latent = torch.mean(result_latents, dim=0)
+    mean_image, _ = decode_image_latent(net, mean_latent.unsqueeze(0))
+    mean_pil_image = tensor2im(mean_image)
+    mean_image_save_path = os.path.join(output_path, 'mean_image.png')
+    mean_pil_image.save(mean_image_save_path)
+    mean_pil_image.resize((256,256)).show()
+
     if show_images:
         for og_image, result_img in zip(input_images, result_images):
             input_vis_image = log_input_image(og_image, opts)
@@ -228,11 +235,3 @@ if __name__ == "__main__":
 
             res_image = Image.fromarray(res)
             res_image.show()
-
-    mean_latent = torch.mean(result_latents, dim=0)
-    mean_image, _ = decode_image_latent(net, mean_latent.unsqueeze(0))
-    mean_pil_image = tensor2im(mean_image)
-    mean_image_save_path = os.path.join(output_path, 'mean_image.png')
-    mean_pil_image.save(mean_image_save_path)
-    mean_pil_image.resize((256,256)).show()
-
