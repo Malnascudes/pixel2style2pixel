@@ -181,7 +181,6 @@ if __name__ == "__main__":
 
     EXPERIMENT_ARGS = EXPERIMENT_DATA_ARGS[experiment_type]
 
-
     model_path = EXPERIMENT_ARGS['model_path']
     print(f'Loading model from {model_path}')
     ckpt = torch.load(model_path, map_location='cpu')
