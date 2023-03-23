@@ -204,9 +204,7 @@ if __name__ == "__main__":
 
     ## PERFORM INFERENCE
     print(f'Performing inference')
-    print(f'shape: {input_images[0].shape}')
     result_images, result_latents = perform_inference_on_list(torch.stack(input_images), net)
-    print(f'result_latents: {result_latents}')
     print(f'type(result_latents): {type(result_latents)}')
     print(f'result_latents.shape: {result_latents.shape}')
 
