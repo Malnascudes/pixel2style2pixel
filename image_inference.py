@@ -77,19 +77,6 @@ def load_images(image_folder: str, img_transforms):
 
     return image_list
 
-def perform_inference(input_image, net):
-    if experiment_type in ["celebs_sketch_to_face", "celebs_seg_to_face"]:
-        latent_mask = [8, 9, 10, 11, 12, 13, 14, 15, 16, 17]
-    else:
-        latent_mask = None
-
-    with torch.no_grad():
-        tic = time.time()
-        result_image, result_latents = run_on_batch(input_image.unsqueeze(0), net, latent_mask)
-        toc = time.time()
-        print('Inference took {:.4f} seconds.'.format(toc - tic))
-
-    return result_image, result_latents
 
 def perform_inference_on_list(input_image_list, net):
     if experiment_type in ["celebs_sketch_to_face", "celebs_seg_to_face"]:
