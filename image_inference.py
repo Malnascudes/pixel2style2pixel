@@ -23,8 +23,11 @@ def run_alignment(image_path):
     print("Aligned image has shape: {}".format(aligned_image.size))
     return aligned_image
 
+# Method copied from predict.py lin 165
 def run_on_batch(inputs, net, latent_mask=None):
     if latent_mask is None:
+        # Part of the code that is executed
+        # inputs.to("cuda").float() to 
         result_batch = net(inputs.to("cuda").float(), randomize_noise=False)
         return result_batch
     else:
