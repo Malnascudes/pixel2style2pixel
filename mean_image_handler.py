@@ -111,7 +111,9 @@ class ModelHandler():
         :return: list of inference output in NDArray
         """
         # Do some inference call to engine here and return output
-        return model_input
+        model_output = model_input
+
+        return model_output
 
     def postprocess(self, inference_output):
         """
