@@ -92,7 +92,9 @@ class ModelHandler():
         :param context: Initial context contains model server system properties.
         :return: prediction output
         """
-        self.processed_input_image = self.preprocess(data)
+        input_image = self.load_image(data)
+
+        self.processed_input_image = self.preprocess(input_image)
 
         model_output = self.inference(self.processed_input_image)
 
