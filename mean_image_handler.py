@@ -146,3 +146,9 @@ if __name__ == "__main__":
     model_handler.initialize(None)
 
     print('Model initialized')
+
+    image_path = '/home/carles/repos/matriu.id/ideal/Datasets/sorolla-test-faces/minimum-subset/CFD-AM-229-224-N.jpg'
+    i_t = time.time()
+
+    model_output = model_handler.handle(image_path, None)
+    print(f'Image processed in {time.time() - i_t} seconds')
