@@ -122,7 +122,13 @@ class ModelHandler():
         :param batch: list of raw requests, should match batch size
         :return: list of preprocessed model input data
         """
-        return input_image
+        original_image = self.run_alignment(input_image)
+        rgb_image = original_image.convert("RGB")
+        transformed_image = self.img_transforms(rgb_image)
+
+        preprocessed_image = transformed_image
+
+        return preprocessed_image
 
     def run_alignment(self, input_image):
         aligned_image = align_face(input_image=input_image, predictor=self.alignment_predictor)
