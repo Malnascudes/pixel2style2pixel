@@ -145,6 +145,14 @@ class ModelHandler():
 
         return model_output
 
+    def encode_image(self, image):
+        input_image_tensor = image.unsqueeze(0)
+        image_latents = self.net.encoder(input_image_tensor.to(self.device).float())
+
+        # normalize with respect to the center of an average face (models/psp.py L75)
+        image_latents = image_latents + self.net.latent_avg.repeat(image_latents.shape[0], 1, 1)
+        return image_latents
+
     def postprocess(self, inference_output):
         """
         Return inference result.
