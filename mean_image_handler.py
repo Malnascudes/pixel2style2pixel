@@ -178,6 +178,11 @@ class ModelHandler():
                                                 return_latents=True)
         return images[0], result_latent
 
+    def merge_latent_to_mean(self, input_latent):
+        all_latents = torch.stack([torch.squeeze(self.mean_image_encoding).to(self.device), torch.squeeze(input_latent).to(self.device)], dim=0)
+        mean_latent = torch.mean(all_latents, dim=0)
+        return mean_latent   
+
     def postprocess(self, inference_output):
         """
         Return inference result.
