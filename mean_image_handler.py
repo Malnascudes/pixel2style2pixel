@@ -9,6 +9,7 @@ import time
 import dlib
 from scripts.align_all_parallel import align_face
 from utils.common import tensor2im
+from utils.interpolate import interpolate
 
 # class ModelHandler(BaseHandler): # for TorchServe  it need to inherit from BaseHandler
 class ModelHandler():
@@ -202,6 +203,23 @@ class ModelHandler():
         # Take output from network and post-process to desired format
         postprocess_output = inference_output
         return postprocess_output
+
+    def generate_animation(self, encodings, FPS=25, duration_per_image=1):
+        encodings = [encoding.squeeze() for encoding in encodings]
+        animation_frames = []
+
+        print('Generating morphing animation')
+        for i, latent in enumerate(interpolate(
+                latents_list=encodings, duration_list=[duration_per_image]*len(encodings),
+                interpolation_type="linear",
+                loop=False,
+                FPS=FPS,
+            )):
+            frame_image, _ = self.decode_image_latent(latent)
+            frame_image = tensor2im(frame_image)
+            animation_frames.append(frame_image)
+
+        return animation_frames
 
 if __name__ == "__main__":
     model_handler = ModelHandler()
