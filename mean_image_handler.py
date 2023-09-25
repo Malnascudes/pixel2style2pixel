@@ -99,6 +99,7 @@ class ModelHandler():
         input_image = self.load_image(data)
 
         self.processed_input_image = self.preprocess(input_image)
+        self.mean_image_encoding = self.load_mean_encoding()
 
         model_output = self.inference(self.processed_input_image)
 
