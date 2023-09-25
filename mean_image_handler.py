@@ -130,6 +130,13 @@ class ModelHandler():
 
         return mean_image_encoding
 
+    def save_mean_encoding(self, mean_encoding):
+        self.mean_image_encoding = mean_encoding
+
+        torch.save(self.mean_image_encoding, self.mean_encodings_file_path)
+
+        return None
+
     def preprocess(self, input_image):
         """
         Transform raw input into model input data.
