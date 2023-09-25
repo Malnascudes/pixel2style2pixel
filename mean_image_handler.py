@@ -217,6 +217,11 @@ if __name__ == "__main__":
 
     model_handler.save_mean_encoding(result_latent)
 
+    image2_path = '/home/carles/repos/matriu.id/ideal/Datasets/sorolla-test-faces/minimum-subset/CFD-BF-051-035-N.jpg'
+    iii_t = time.time()
+
+    output_image, result_latent = model_handler.handle(image2_path, None)
+
     output_path = 'test.tiff'
     output_image.save(output_path)
     print(result_latent.shape)
