@@ -130,6 +130,13 @@ class ModelHandler():
 
         return mean_image_encoding
 
+    def save_mean_encoding(self, mean_encoding):
+        self.mean_image_encoding = mean_encoding
+
+        torch.save(self.mean_image_encoding, self.mean_encodings_file_path)
+
+        return None
+
     def preprocess(self, input_image):
         """
         Transform raw input into model input data.
@@ -207,6 +214,8 @@ if __name__ == "__main__":
 
     output_image, result_latent = model_handler.handle(image_path, None)
     print(f'Image processed in {time.time() - i_t} seconds')
+
+    model_handler.save_mean_encoding(result_latent)
 
     output_path = 'test.tiff'
     output_image.save(output_path)
