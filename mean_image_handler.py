@@ -154,6 +154,13 @@ class ModelHandler():
         image_latents = image_latents + self.net.latent_avg.repeat(image_latents.shape[0], 1, 1)
         return image_latents
 
+    def decode_image_latent(self, latent):
+        images, result_latent = self.net.decoder([latent],
+                                                input_is_latent=True,
+                                                randomize_noise=False,
+                                                return_latents=True)
+        return images[0], result_latent
+
     def postprocess(self, inference_output):
         """
         Return inference result.
