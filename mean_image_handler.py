@@ -117,6 +117,18 @@ class ModelHandler():
 
         return input_image
 
+    def load_mean_encoding(self):
+        mean_image_encoding = None
+
+        if os.path.exists(self.mean_encodings_file_path):
+            print(f'Loading mean encoding from {self.mean_encodings_file_path}')
+            mean_image_encoding = torch.load(self.mean_encodings_file_path)
+        else: # means its first image
+            print(f'No encoding found in {self.mean_encodings_file_path}. Using input image as mean.')
+            mean_image_encoding = self.encode_image(self.processed_input_image)
+
+        return mean_image_encoding
+
     def preprocess(self, input_image):
         """
         Transform raw input into model input data.
