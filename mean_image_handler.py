@@ -8,6 +8,7 @@ from models.psp import pSp
 import time
 import dlib
 from scripts.align_all_parallel import align_face
+from utils.common import tensor2im
 
 # class ModelHandler(BaseHandler): # for TorchServe  it need to inherit from BaseHandler
 class ModelHandler():
@@ -142,7 +143,10 @@ class ModelHandler():
         """
         # Do some inference call to engine here and return output
         image_encoding = self.encode_image(model_input)
-        model_output = image_encoding
+        output_image, result_latent = self.decode_image_latent(image_encoding)
+        output__pil_image = tensor2im(output_image)
+    
+        model_output = output__pil_image, result_latent
 
         return model_output
 
@@ -180,5 +184,5 @@ if __name__ == "__main__":
     image_path = '/home/carles/repos/matriu.id/ideal/Datasets/sorolla-test-faces/minimum-subset/CFD-AM-229-224-N.jpg'
     i_t = time.time()
 
-    model_output = model_handler.handle(image_path, None)
+    output_image, result_latent = model_handler.handle(image_path, None)
     print(f'Image processed in {time.time() - i_t} seconds')
