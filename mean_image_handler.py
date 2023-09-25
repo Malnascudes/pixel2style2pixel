@@ -156,7 +156,10 @@ class ModelHandler():
         """
         # Do some inference call to engine here and return output
         image_encoding = self.encode_image(model_input)
-        output_image, result_latent = self.decode_image_latent(image_encoding)
+
+        mean_latent = self.merge_latent_to_mean(image_encoding)
+
+        output_image, result_latent = self.decode_image_latent(mean_latent.unsqueeze(0))
         output__pil_image = tensor2im(output_image)
     
         model_output = output__pil_image, result_latent
