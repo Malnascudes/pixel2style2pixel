@@ -252,6 +252,10 @@ if __name__ == "__main__":
 
     output_image, result_latent, input_image2_encoding = model_handler.handle(image2_path, None)
 
-    output_path = 'test.tiff'
-    output_image.save(output_path)
-    print(result_latent.shape)
+    animation_frames = model_handler.generate_animation([input_image1_encoding, input_image2_encoding])
+
+    print('Saving Video Frames')
+    output_path = 'tests/output_frames/'
+    video_t = time.time()
+    model_handler.save_frames(animation_frames, output_path)
+    print(f'Saved video in {time.time() - video_t}')
