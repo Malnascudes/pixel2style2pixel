@@ -221,6 +221,18 @@ class ModelHandler():
 
         return animation_frames
 
+    @staticmethod
+    def save_frames(video_frames, output_path, output_format = 'tiff'):
+        frame_folder = os.path.join(output_path, 'frames')
+        if not os.path.exists(frame_folder):
+            os.makedirs(frame_folder)
+
+        for i, frame_image in enumerate(video_frames):
+            frame_image_save_path = os.path.join(frame_folder,f'frame_{i:04}.{output_format}')
+            i_t = time.time()
+            frame_image.save(frame_image_save_path)
+            print(f'Took {time.time() - i_t} to save frame')
+
 if __name__ == "__main__":
     model_handler = ModelHandler()
     model_handler.initialize(None)
