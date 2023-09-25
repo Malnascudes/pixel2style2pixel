@@ -162,14 +162,14 @@ class ModelHandler():
         :return: list of inference output in NDArray
         """
         # Do some inference call to engine here and return output
-        image_encoding = self.encode_image(model_input)
+        input_image_encoding = self.encode_image(model_input)
 
-        mean_latent = self.merge_latent_to_mean(image_encoding)
+        mean_latent = self.merge_latent_to_mean(input_image_encoding)
 
         output_image, result_latent = self.decode_image_latent(mean_latent.unsqueeze(0))
         output__pil_image = tensor2im(output_image)
-    
-        model_output = output__pil_image, result_latent
+
+        model_output = output__pil_image, result_latent, input_image_encoding
 
         return model_output
 
@@ -212,7 +212,7 @@ if __name__ == "__main__":
     image_path = '/home/carles/repos/matriu.id/ideal/Datasets/sorolla-test-faces/minimum-subset/CFD-AM-229-224-N.jpg'
     i_t = time.time()
 
-    output_image, result_latent = model_handler.handle(image_path, None)
+    output_image, result_latent, input_image_emnconding = model_handler.handle(image_path, None)
     print(f'Image processed in {time.time() - i_t} seconds')
 
     model_handler.save_mean_encoding(result_latent)
