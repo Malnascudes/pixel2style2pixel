@@ -169,7 +169,7 @@ class ModelHandler():
         output_image, result_latent = self.decode_image_latent(mean_latent.unsqueeze(0))
         output__pil_image = tensor2im(output_image)
 
-        model_output = output__pil_image, result_latent, input_image_encoding
+        model_output = output__pil_image, mean_latent, input_image_encoding
 
         return model_output
 
