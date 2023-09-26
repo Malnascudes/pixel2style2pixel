@@ -1,9 +1,11 @@
 from argparse import Namespace
 import pprint
+import PIL
 import torch
 import torchvision.transforms as transforms
 import os
 from models.psp import pSp
+import time
 
 # class ModelHandler(BaseHandler): # for TorchServe  it need to inherit from BaseHandler
 class ModelHandler():
@@ -24,6 +26,7 @@ class ModelHandler():
                 transforms.ToTensor(),
                 transforms.Normalize([0.5, 0.5, 0.5], [0.5, 0.5, 0.5])])
         }
+        self.allowed_extensions = ['png', 'jpg', 'jpeg']
 
     def initialize(self, context):
         """
@@ -89,11 +92,26 @@ class ModelHandler():
         :param context: Initial context contains model server system properties.
         :return: prediction output
         """
-        self.processed_input_image = self.preprocess(data)
+        input_image = self.load_image(data)
+
+        self.processed_input_image = self.preprocess(input_image)
 
         model_output = self.inference(self.processed_input_image)
 
         return self.postprocess(model_output)
+
+    def load_image(self, full_image_path: str):
+        print(f'Loading {full_image_path}')
+        i_t = time.time()
+        image_extension = full_image_path.split('.')[-1]
+        if image_extension not in self.allowed_extensions:
+            print(f'{image_extension} file extension not allowed')
+            return None
+
+        input_image = PIL.Image.open(full_image_path)
+        print(f'Image loaded in {time.time() - i_t} seconds')
+
+        return input_image
 
     def preprocess(self, input_image):
         """
@@ -130,3 +148,9 @@ if __name__ == "__main__":
     model_handler.initialize(None)
 
     print('Model initialized')
+
+    image_path = '/home/carles/repos/matriu.id/ideal/Datasets/sorolla-test-faces/minimum-subset/CFD-AM-229-224-N.jpg'
+    i_t = time.time()
+
+    model_output = model_handler.handle(image_path, None)
+    print(f'Image processed in {time.time() - i_t} seconds')
