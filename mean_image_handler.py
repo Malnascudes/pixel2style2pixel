@@ -6,6 +6,8 @@ import torchvision.transforms as transforms
 import os
 from models.psp import pSp
 import time
+import dlib
+from scripts.align_all_parallel import align_face
 
 # class ModelHandler(BaseHandler): # for TorchServe  it need to inherit from BaseHandler
 class ModelHandler():
@@ -61,6 +63,7 @@ class ModelHandler():
             raise RuntimeError("Missing the model.pt file")
 
         self.model = torch.load(model_pt_path, map_location='cpu')
+        self.alignment_predictor = dlib.shape_predictor("shape_predictor_68_face_landmarks.dat")
 
         opts = self.model['opts']
         pprint.pprint(opts)
@@ -119,8 +122,17 @@ class ModelHandler():
         :param batch: list of raw requests, should match batch size
         :return: list of preprocessed model input data
         """
-        return input_image
+        original_image = self.run_alignment(input_image)
+        rgb_image = original_image.convert("RGB")
+        transformed_image = self.img_transforms(rgb_image)
 
+        preprocessed_image = transformed_image
+
+        return preprocessed_image
+
+    def run_alignment(self, input_image):
+        aligned_image = align_face(input_image=input_image, predictor=self.alignment_predictor)
+        return aligned_image
 
     def inference(self, model_input):
         """
