@@ -4,12 +4,12 @@ import PIL
 import torch
 import torchvision.transforms as transforms
 import os
-from models.psp import pSp
+from psp import pSp
 import time
 import dlib
-from scripts.align_all_parallel import align_face
-from utils.common import tensor2im
-from utils.interpolate import interpolate
+from align_all_parallel import align_face
+from common import tensor2im
+from interpolate import interpolate
 from ts.torch_handler.base_handler import BaseHandler
 from ts.context import Context
 
