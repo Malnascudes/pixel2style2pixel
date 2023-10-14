@@ -162,11 +162,12 @@ class ModelHandler():
         :return: list of inference output in NDArray
         """
         # Do some inference call to engine here and return output
-        image_encoding = self.encode_image(model_input)
-        output_image, result_latent = self.decode_image_latent(image_encoding)
-        output__pil_image = tensor2im(output_image)
-    
-        model_output = output__pil_image, result_latent
+        with torch.no_grad():
+            image_encoding = self.encode_image(model_input)
+            output_image, result_latent = self.decode_image_latent(image_encoding)
+            output__pil_image = tensor2im(output_image)
+        
+            model_output = output__pil_image, result_latent
 
         return model_output
 
