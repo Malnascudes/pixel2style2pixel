@@ -141,9 +141,19 @@ class ModelHandler():
         :return: list of inference output in NDArray
         """
         # Do some inference call to engine here and return output
-        model_output = model_input
+        with torch.no_grad():
+            image_encoding = self.encode_image(model_input)
+            model_output = image_encoding
 
         return model_output
+
+    def encode_image(self, image):
+        input_image_tensor = image.unsqueeze(0)
+        image_latents = self.net.encoder(input_image_tensor.to(self.device).float())
+
+        # normalize with respect to the center of an average face (models/psp.py L75)
+        image_latents = image_latents + self.net.latent_avg.repeat(image_latents.shape[0], 1, 1)
+        return image_latents
 
     def postprocess(self, inference_output):
         """
