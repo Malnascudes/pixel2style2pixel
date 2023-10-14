@@ -1,6 +1,7 @@
 from argparse import Namespace
 import pprint
 import PIL
+from PIL import ImageDraw
 import torch
 import torchvision.transforms as transforms
 import os
@@ -8,6 +9,9 @@ from models.psp import pSp
 import time
 import dlib
 from scripts.align_all_parallel import align_face
+from scripts.align_all_parallel import get_landmark
+import numpy as np
+import json
 
 # class ModelHandler(BaseHandler): # for TorchServe  it need to inherit from BaseHandler
 class ModelHandler():
@@ -133,6 +137,72 @@ class ModelHandler():
     def run_alignment(self, input_image):
         aligned_image = align_face(input_image=input_image, predictor=self.alignment_predictor)
         return aligned_image
+
+    def get_face_landmarks(self, input_image):
+        img_array = np.asarray(input_image.convert('RGB')).astype(np.uint8)
+        lm = get_landmark(img_array, self.alignment_predictor)
+
+        return lm
+
+    @staticmethod
+    def plot_landmarks_over_image(input_image, landmarks):
+        # Create a PIL draw object to draw the landmarks on the image
+        draw = ImageDraw.Draw(input_image)
+
+        # Iterate over the face landmarks and draw them on the image
+        for i, landmark in enumerate(landmarks):
+            x, y = landmark
+            r = 3
+            leftUpPoint = (x-r, y-r)
+            rightDownPoint = (x+r, y+r)
+            twoPointList = [leftUpPoint, rightDownPoint]
+            draw.ellipse(twoPointList, fill='yellow')
+            # draw.point((x, y), fill='red', size)
+            # draw.regular_polygon((x, y, 3), n_sides = 3, fill='yellow')
+            draw.text((x, y), text=str(i), fill='red', anchor='lt')
+
+        # Return the image with the landmarks drawn on it
+        return input_image
+
+    @staticmethod
+    def save_landmarks(landmarks, output_path):
+        with open(output_path, 'w') as file:
+            for tup in landmarks:
+                file.write(','.join(str(item) for item in tup) + '\n')
+
+        return None
+
+    @staticmethod
+    def save_landmarks_structured(landmarks, output_path):
+        extension = output_path.split('.')[-1]
+        output_path = output_path.replace(extension, 'json')
+
+        lm_chin = landmarks[0: 17]  # left-right
+        lm_eyebrow_left = landmarks[17: 22]  # left-right
+        lm_eyebrow_right = landmarks[22: 27]  # left-right
+        lm_nose = landmarks[27: 31]  # top-down
+        lm_nostrils = landmarks[31: 36]  # top-down
+        lm_eye_left = landmarks[36: 42]  # left-clockwise
+        lm_eye_right = landmarks[42: 48]  # left-clockwise
+        lm_mouth_outer = landmarks[48: 60]  # left-clockwise
+        lm_mouth_inner = landmarks[60: 68]  # left-clockwise
+
+        landmarks_dict = {
+            "chin": lm_chin.tolist(),
+            "eyebrow_left": lm_eyebrow_left.tolist(),
+            "eyebrow_right": lm_eyebrow_right.tolist(),
+            "nose": lm_nose.tolist(),
+            "nostrils": lm_nostrils.tolist(),
+            "eye_left": lm_eye_left.tolist(),
+            "eye_right": lm_eye_right.tolist(),
+            "mouth_outer": lm_mouth_outer.tolist(),
+            "mouth_inner": lm_mouth_inner.tolist(),
+        }
+
+        with open(output_path, 'w') as file:
+            json.dump(landmarks_dict, file, indent=4)
+
+        return None
 
     def inference(self, model_input):
         """
