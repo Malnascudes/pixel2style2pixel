@@ -157,7 +157,8 @@ class Predictor(BasePredictor):
         return out_path
 
     def run_alignment(self, image_path):
-        aligned_image = align_face(filepath=image_path, predictor=self.predictor)
+        input_image = Image.open(image_path)
+        aligned_image = align_face(input_image=input_image, predictor=self.predictor)
         print("Aligned image has shape: {}".format(aligned_image.size))
         return aligned_image
 
