@@ -141,8 +141,9 @@ class ModelHandler():
         :return: list of inference output in NDArray
         """
         # Do some inference call to engine here and return output
-        image_encoding = self.encode_image(model_input)
-        model_output = image_encoding
+        with torch.no_grad():
+            image_encoding = self.encode_image(model_input)
+            model_output = image_encoding
 
         return model_output
 
