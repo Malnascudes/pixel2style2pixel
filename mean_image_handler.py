@@ -163,11 +163,14 @@ class ModelHandler():
         """
         # Do some inference call to engine here and return output
         with torch.no_grad():
-            image_encoding = self.encode_image(model_input)
-            output_image, result_latent = self.decode_image_latent(image_encoding)
-            output__pil_image = tensor2im(output_image)
-        
-            model_output = output__pil_image, result_latent
+            input_image_encoding = self.encode_image(model_input)
+
+            mean_latent = self.merge_latent_to_mean(input_image_encoding)
+
+            output_image, result_latent = self.decode_image_latent(mean_latent.unsqueeze(0))
+            output_pil_image = tensor2im(output_image)
+
+            model_output = output_pil_image, mean_latent, input_image_encoding
 
         return model_output
 
@@ -185,6 +188,11 @@ class ModelHandler():
                                                 randomize_noise=False,
                                                 return_latents=True)
         return images[0], result_latent
+
+    def merge_latent_to_mean(self, input_latent):
+        all_latents = torch.stack([torch.squeeze(self.mean_image_encoding).to(self.device), torch.squeeze(input_latent).to(self.device)], dim=0)
+        mean_latent = torch.mean(all_latents, dim=0)
+        return mean_latent   
 
     def postprocess(self, inference_output):
         """
@@ -205,10 +213,15 @@ if __name__ == "__main__":
     image_path = '/home/carles/repos/matriu.id/ideal/Datasets/sorolla-test-faces/minimum-subset/CFD-AM-229-224-N.jpg'
     i_t = time.time()
 
-    output_image, result_latent = model_handler.handle(image_path, None)
+    output_image, result_latent, input_image1_encoding = model_handler.handle(image_path, None)
     print(f'Image processed in {time.time() - i_t} seconds')
 
     model_handler.save_mean_encoding(result_latent)
+
+    image2_path = '/home/carles/repos/matriu.id/ideal/Datasets/sorolla-test-faces/minimum-subset/CFD-BF-051-035-N.jpg'
+    iii_t = time.time()
+
+    output_image, result_latent, input_image2_encoding = model_handler.handle(image2_path, None)
 
     output_path = 'test.tiff'
     output_image.save(output_path)
