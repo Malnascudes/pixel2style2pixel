@@ -10,9 +10,10 @@ import dlib
 from scripts.align_all_parallel import align_face
 from utils.common import tensor2im
 from utils.interpolate import interpolate
+from ts.torch_handler.base_handler import BaseHandler
+from ts.context import Context
 
-# class ModelHandler(BaseHandler): # for TorchServe  it need to inherit from BaseHandler
-class ModelHandler():
+class ModelHandler(BaseHandler): # for TorchServe  it need to inherit from BaseHandler
     """
     A custom model handler implementation.
     """
@@ -23,8 +24,6 @@ class ModelHandler():
         self.explain = False
         self.target = 0
         self.experiment_data_args = {
-            "model_path": "pretrained_models/psp_ffhq_encode.pt",
-            "image_path": "notebooks/images/input_img.jpg",
             "transform": transforms.Compose([
                 transforms.Resize((256, 256)),
                 transforms.ToTensor(),
@@ -41,7 +40,6 @@ class ModelHandler():
 
         # From Torchserve on how to init. I guess manifest and other variables are necessary for propper working.
         # Content will be handled by Torchserve and include the necessary information
-        '''
         self._context = context
 
         #  load the model
@@ -49,14 +47,14 @@ class ModelHandler():
 
         properties = context.system_properties
         model_dir = properties.get("model_dir")
+        '''
         self.device = torch.device("cuda:" + str(properties.get("gpu_id")) if torch.cuda.is_available() else "cpu")
         
         # Read model serialize/pt file
+        '''
         serialized_file = self.manifest['model']['serializedFile']
         model_pt_path = os.path.join(model_dir, serialized_file)
-        '''
 
-        model_pt_path = self.experiment_data_args['model_path']
 
         # self.device = "cpu" # Not fully working on cpu yet
         self.device = "cuda"
@@ -97,7 +95,8 @@ class ModelHandler():
         :param context: Initial context contains model server system properties.
         :return: prediction output
         """
-        input_image = self.load_image(data)
+        image_bytes = data[0]['body']
+        input_image = self.load_image(image_bytes)
 
         self.processed_input_image = self.preprocess(input_image)
         self.mean_image_encoding = self.load_mean_encoding()
@@ -106,18 +105,14 @@ class ModelHandler():
 
         return self.postprocess(model_output)
 
-    def load_image(self, full_image_path: str):
-        print(f'Loading {full_image_path}')
+    def load_image(self, image_bytes: str):
         i_t = time.time()
-        image_extension = full_image_path.split('.')[-1]
-        if image_extension not in self.allowed_extensions:
-            print(f'{image_extension} file extension not allowed')
-            return None
 
-        input_image = PIL.Image.open(full_image_path)
+        input_image = PIL.Image.open(io.BytesIO(image_bytes))
         print(f'Image loaded in {time.time() - i_t} seconds')
 
         return input_image
+
 
     def load_mean_encoding(self):
         mean_image_encoding = None
@@ -234,8 +229,13 @@ class ModelHandler():
             print(f'Took {time.time() - i_t} to save frame')
 
 if __name__ == "__main__":
+    model_dir = "pretrained_models"
+    model_name = "psp_ffhq_encode.pt"
+    manifest = {'model': {'serializedFile': model_name}}
+    context = Context(model_dir=model_dir, model_name="pSp", manifest=manifest,batch_size=1,gpu=0,mms_version="1.0.0")
+
     model_handler = ModelHandler()
-    model_handler.initialize(None)
+    model_handler.initialize(context)
 
     print('Model initialized')
 
