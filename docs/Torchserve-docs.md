@@ -112,3 +112,10 @@ did not work.
 
 ## Check compiled
 `Your torch version is 1.6.0 which does not support torch.compile` Message appears, upgrade to compatible version
+
+torch.compile is [only available in pytorch>=2.0](https://pytorch.org/tutorials/intermediate/torch_compile_tutorial.html). New environment wiht pytorch2.1 created
+
+Same error happens:
+```
+TypeError: upfirdn2d(): incompatible function arguments. The following argument 1. (arg0: torch.Tensor, arg1: torch.Tensor, arg2: int, arg3: int, arg4: int, arg5: int, arg6: int, arg7: int, arg8: int, arg9: int) -> torch.Tensor
+```
