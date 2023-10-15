@@ -77,3 +77,38 @@ torchserve --stop
 # Refs
 [How to Serve PyTorch Models with TorchServe Youtube Video](https://www.youtube.com/watch?v=XlO7iQMV3Ik)
 [pytroch/serve/examples/image_classifier/resnet_18](https://github.com/pytorch/serve/tree/master/examples/image_classifier/resnet_18)
+
+# upFirdn2d error:
+```
+TypeError: upfirdn2d(): incompatible function arguments. The following argument types are supported: 1. (arg0: at::Tensor, arg1: at::Tensor, arg2: int, arg3: int, arg4: int, arg5: int, arg6: int, arg7: int, arg8: int, arg9: int) -> at::Tensor
+```
+
+This function is used for up-sampling and down-sampling images in the StyleGAN architecture.
+
+[Possible solution](https://github.com/rosinality/stylegan2-pytorch/issues/304) renaming the upfirdn2d.py file to upfirdn2dpkg.py and using PyTorch 1.9.0. However, the user did not provide a clear explanation of why this solution worked.
+
+[Another user suggested](https://github.com/sapphire497/style-transformer/issues/12) that the issue might be related to the torch.cpp_extension in the stylegan.op path github.com. This could indicate a problem with the compilation of the custom C++/CUDA code used in StyleGAN.
+
+To troubleshoot this issue, you should confirm that:
+
+* The correct number and type of arguments are being passed to the upfirdn2d() function.
+* You are using a compatible version of PyTorch. You might want to try PyTorch 1.9.0, as suggested by the user.
+* The custom C++/CUDA code in StyleGAN has been compiled correctly. If you are using a precompiled version of StyleGAN, you might want to try compiling it yourself to ensure that it is compatible with your specific system configuration.
+
+## Change UpFirDn2d.apply inputs
+Change inputs from 
+```
+out = UpFirDn2d.apply(
+    input, kernel, up, up, down, down, pad[0], pad[1], pad[0], pad[1]
+)
+```
+to
+```
+out = UpFirDn2d.apply(
+    input, kernel, up, up, down, down, pad[0], pad[1], pad[0], pad[1]
+)
+```
+did not work.
+
+## Check compiled
+`Your torch version is 1.6.0 which does not support torch.compile` Message appears, upgrade to compatible version
