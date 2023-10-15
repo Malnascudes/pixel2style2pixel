@@ -12,6 +12,7 @@ from common import tensor2im
 from interpolate import interpolate
 from ts.torch_handler.base_handler import BaseHandler
 from ts.context import Context
+import io
 
 class ModelHandler(BaseHandler): # for TorchServe  it need to inherit from BaseHandler
     """
