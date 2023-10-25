@@ -195,6 +195,12 @@ class ModelHandler():
         mean_latent = torch.mean(all_latents, dim=0)
         return mean_latent   
 
+    def style_mix(self, image1_encoding, image2_encoding, latent_mask):
+        for i in latent_mask:
+            image1_encoding[:, i] = image2_encoding[:, i]
+
+        return image1_encoding
+
     def postprocess(self, inference_output):
         """
         Return inference result.
