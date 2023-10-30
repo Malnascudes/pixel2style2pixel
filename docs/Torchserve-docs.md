@@ -56,6 +56,8 @@ systemctl stop anydesk.service
 ## Start TorchServe
 ```
 torchserve --start --model-store model_store --models pSp=pSp.mar
+
+torchserve --start --model-store model_store --models pSp=pSp.mar --ts-config config.properties --ncs
 ```
 
 
@@ -72,6 +74,17 @@ curl http://127.0.0.1:8080/predictions/pSp -T <path-to-image>
 # Stop TorchServe
 ```
 torchserve --stop
+```
+
+# With Docker
+```
+docker run --rm -it -p 8080:8080 -p 8081:8081 \
+            -v $(pwd):/home/model_files \
+            --name mar pytorch/torchserve:latest
+
+docker exec -it --user root mar /bin/bash
+
+cd ../model_files
 ```
 
 # Refs
