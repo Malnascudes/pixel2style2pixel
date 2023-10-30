@@ -32,7 +32,7 @@ torch-model-archiver --model-name pSp --version 1.0 \
 --serialized-file ./pretrained_models/psp_ffhq_encode.pt \
 --handler mean_image_handler \
 --requirements requirements.txt \
---extra-files ./scripts/align_all_parallel.py,./utils/common.py,./utils/interpolate.py,./models/psp.py,./models/encoders/psp_encoders.py,./models/encoders/helpers.py,./models/stylegan2/model.py,./models/stylegan2/op/fused_act.py,./models/stylegan2/op/upfirdn2d.py,./configs/paths_config.py,./models/stylegan2/op/upfirdn2d.cpp,./models/stylegan2/op/upfirdn2d_kernel.cu,./models/stylegan2/op/fused_bias_act.cpp,./models/stylegan2/op/fused_bias_act_kernel.cu,./shape_predictor_68_face_landmarks.dat
+--extra-files ./scripts/align_all_parallel.py,./utils/common.py,./utils/interpolate.py,./models/psp.py,./models/encoders/psp_encoders.py,./models/encoders/helpers.py,./models/stylegan2/model.py,./models/stylegan2/op/fused_act.py,./models/stylegan2/op/upfirdn2dpkg.py,./configs/paths_config.py,./models/stylegan2/op/upfirdn2d.cpp,./models/stylegan2/op/upfirdn2d_kernel.cu,./models/stylegan2/op/fused_bias_act.cpp,./models/stylegan2/op/fused_bias_act_kernel.cu,./shape_predictor_68_face_landmarks.dat
 
 mkdir model_store
 mv pSp.mar model_store/
@@ -98,7 +98,7 @@ TypeError: upfirdn2d(): incompatible function arguments. The following argument 
 
 This function is used for up-sampling and down-sampling images in the StyleGAN architecture.
 
-[Possible solution](https://github.com/rosinality/stylegan2-pytorch/issues/304) renaming the upfirdn2d.py file to upfirdn2dpkg.py and using PyTorch 1.9.0. However, the user did not provide a clear explanation of why this solution worked.
+[Possible solution](https://github.com/rosinality/stylegan2-pytorch/issues/304) renaming the upfirdn2d.py file to upfirdn2dpkg.py and using PyTorch 1.9.0. However, the user did not provide a clear explanation of why this solution worked. **FUCKING WORKS**
 
 [Another user suggested](https://github.com/sapphire497/style-transformer/issues/12) that the issue might be related to the torch.cpp_extension in the stylegan.op path github.com. This could indicate a problem with the compilation of the custom C++/CUDA code used in StyleGAN.
 
