@@ -14,6 +14,7 @@ from ts.torch_handler.base_handler import BaseHandler
 from ts.context import Context
 import io
 import base64
+from tqdm import tqdm
 
 class ModelHandler(BaseHandler): # for TorchServe  it need to inherit from BaseHandler
     """
@@ -209,13 +210,12 @@ class ModelHandler(BaseHandler): # for TorchServe  it need to inherit from BaseH
         encodings = [encoding.squeeze() for encoding in encodings]
         animation_frames = []
 
-        print('Generating morphing animation')
-        for i, latent in enumerate(interpolate(
+        for latent in tqdm(interpolate(
                 latents_list=encodings, duration_list=[duration_per_image]*len(encodings),
                 interpolation_type="linear",
                 loop=False,
                 FPS=FPS,
-            )):
+            ), desc='Generating morphing animation'):
             frame_image, _ = self.decode_image_latent(latent)
             frame_image = tensor2im(frame_image)
             animation_frames.append(frame_image)
