@@ -132,3 +132,6 @@ Same error happens:
 ```
 TypeError: upfirdn2d(): incompatible function arguments. The following argument 1. (arg0: torch.Tensor, arg1: torch.Tensor, arg2: int, arg3: int, arg4: int, arg5: int, arg6: int, arg7: int, arg8: int, arg9: int) -> torch.Tensor
 ```
+
+# Big File Error
+[Reference](https://github.com/pytorch/serve/blob/master/docs/Troubleshooting.md)
