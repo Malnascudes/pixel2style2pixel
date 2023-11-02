@@ -13,6 +13,7 @@ from interpolate import interpolate
 from ts.torch_handler.base_handler import BaseHandler
 from ts.context import Context
 import io
+import base64
 
 class ModelHandler(BaseHandler): # for TorchServe  it need to inherit from BaseHandler
     """
@@ -229,6 +230,15 @@ class ModelHandler(BaseHandler): # for TorchServe  it need to inherit from BaseH
             i_t = time.time()
             frame_image.save(frame_image_save_path)
             print(f'Took {time.time() - i_t} to save frame')
+
+    @staticmethod
+    def image_to_base64(image):
+        print('Encoding image')
+        byte_arr = io.BytesIO()
+        # image.save(byte_arr, format='tiff')
+        image.save(byte_arr, format='JPEG', quality=80)  # Save the image in JPEG format with a lower quality
+        byte_arr = byte_arr.getvalue()
+        return base64.b64encode(byte_arr).decode('utf-8')
 
 if __name__ == "__main__":
     model_dir = "pretrained_models"
