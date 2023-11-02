@@ -199,8 +199,11 @@ class ModelHandler(BaseHandler): # for TorchServe  it need to inherit from BaseH
         :return: list of predict results
         """
         # Take output from network and post-process to desired format
-        postprocess_output = inference_output
-        return postprocess_output
+        
+        encoded_frames = [self.image_to_base64(image) for image in inference_output]
+        postprocess_output = {'video_frames': encoded_frames}
+        # postprocess_output = {'video_frames': [encoded_frames[0], encoded_frames[-1]]}
+        return [postprocess_output]
 
     def generate_animation(self, encodings, FPS=25, duration_per_image=1):
         encodings = [encoding.squeeze() for encoding in encodings]
