@@ -164,10 +164,10 @@ class ModelHandler(BaseHandler): # for TorchServe  it need to inherit from BaseH
 
             mean_latent = self.merge_latent_to_mean(input_image_encoding)
 
-            output_image, result_latent = self.decode_image_latent(mean_latent.unsqueeze(0))
-            output_pil_image = tensor2im(output_image)
+            animation_frames = self.generate_animation([input_image_encoding, mean_latent])
+            model_output = animation_frames
 
-            model_output = output_pil_image, mean_latent, input_image_encoding
+        self.save_mean_encoding(mean_latent)
 
         return model_output
 
