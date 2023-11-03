@@ -4,7 +4,6 @@ from typing import *
 
 import torch
 import PIL
-from utils.common import tensor2im
 
 def interpolate(
     latents_list: List[Union[torch.Tensor, np.ndarray]],
