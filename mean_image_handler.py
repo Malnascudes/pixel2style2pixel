@@ -9,6 +9,7 @@ import time
 import dlib
 from scripts.align_all_parallel import align_face
 from utils.common import tensor2im
+from utils.interpolate import interpolate
 
 # class ModelHandler(BaseHandler): # for TorchServe  it need to inherit from BaseHandler
 class ModelHandler():
@@ -167,10 +168,10 @@ class ModelHandler():
 
             mean_latent = self.merge_latent_to_mean(input_image_encoding)
 
-            output_image, result_latent = self.decode_image_latent(mean_latent.unsqueeze(0))
-            output_pil_image = tensor2im(output_image)
+            animation_frames = self.generate_animation([input_image_encoding, mean_latent])
+            model_output = animation_frames
 
-            model_output = output_pil_image, mean_latent, input_image_encoding
+        self.save_mean_encoding(mean_latent)
 
         return model_output
 
@@ -204,6 +205,35 @@ class ModelHandler():
         postprocess_output = inference_output
         return postprocess_output
 
+    def generate_animation(self, encodings, FPS=25, duration_per_image=1):
+        encodings = [encoding.squeeze() for encoding in encodings]
+        animation_frames = []
+
+        print('Generating morphing animation')
+        for i, latent in enumerate(interpolate(
+                latents_list=encodings, duration_list=[duration_per_image]*len(encodings),
+                interpolation_type="linear",
+                loop=False,
+                FPS=FPS,
+            )):
+            frame_image, _ = self.decode_image_latent(latent)
+            frame_image = tensor2im(frame_image)
+            animation_frames.append(frame_image)
+
+        return animation_frames
+
+    @staticmethod
+    def save_frames(video_frames, output_path, output_format = 'tiff'):
+        frame_folder = os.path.join(output_path, 'frames')
+        if not os.path.exists(frame_folder):
+            os.makedirs(frame_folder)
+
+        for i, frame_image in enumerate(video_frames):
+            frame_image_save_path = os.path.join(frame_folder,f'frame_{i:04}.{output_format}')
+            i_t = time.time()
+            frame_image.save(frame_image_save_path)
+            print(f'Took {time.time() - i_t} to save frame')
+
 if __name__ == "__main__":
     model_handler = ModelHandler()
     model_handler.initialize(None)
@@ -223,6 +253,10 @@ if __name__ == "__main__":
 
     output_image, result_latent, input_image2_encoding = model_handler.handle(image2_path, None)
 
-    output_path = 'test.tiff'
-    output_image.save(output_path)
-    print(result_latent.shape)
+    animation_frames = model_handler.generate_animation([input_image1_encoding, input_image2_encoding])
+
+    print('Saving Video Frames')
+    output_path = 'tests/output_frames/'
+    video_t = time.time()
+    model_handler.save_frames(animation_frames, output_path)
+    print(f'Saved video in {time.time() - video_t}')
